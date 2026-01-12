@@ -2,22 +2,23 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Robot Multi-Mapel Adventure</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Multi-Mapel Adventure - Fixed</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f9ff; text-align: center; padding: 20px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f9ff; text-align: center; padding: 20px; }
         .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         .admin-box { background: #f8fafc; padding: 20px; border-radius: 15px; border: 2px solid #3b82f6; margin-bottom: 20px; text-align: left; }
-        .map-area { background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
-        .track { background: #f1f5f9; height: 70px; margin: 15px 0; border-radius: 35px; position: relative; display: flex; align-items: center; }
+        .map-area { background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #e2e8f0; min-height: 100px; }
+        .track { background: #f1f5f9; height: 70px; margin: 15px 0; border-radius: 35px; position: relative; display: flex; align-items: center; border: 1px solid #ddd; }
         .robot { font-size: 35px; position: absolute; transition: 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); left: 20px; z-index: 2; display: flex; flex-direction: column; align-items: center; }
-        .robot span { font-size: 11px; font-weight: bold; background: white; padding: 2px 5px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .robot span { font-size: 11px; font-weight: bold; background: white; padding: 2px 5px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); color: #333; }
         .finish { position: absolute; right: 20px; font-weight: bold; color: #ef4444; }
         .q-card { background: #3b82f6; color: white; padding: 30px; border-radius: 20px; box-shadow: 0 4px 15px rgba(59,130,246,0.4); }
         button { background: #3b82f6; color: white; border: none; padding: 12px 25px; margin: 8px; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; }
         button:hover { background: #2563eb; transform: scale(1.05); }
         .hidden { display: none; }
-        textarea { width: 100%; height: 100px; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1; font-family: monospace; }
-        input { padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; margin: 5px 0; }
+        textarea { width: 100%; height: 120px; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1; font-family: monospace; box-sizing: border-box; }
+        input { padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; margin: 5px 0; box-sizing: border-box; }
     </style>
 </head>
 <body>
@@ -28,17 +29,17 @@
     <div id="setup-area">
         <div class="admin-box">
             <h3>⚙️ Pengaturan Game</h3>
-            <label>Masukkan Nama Pemain (pisah dengan koma):</label><br>
-            <input type="text" id="pNames" placeholder="Contoh: Andi, Budi, Siti" style="width: 95%;"><br><br>
+            <label><b>1. Nama Pemain (pisahkan dengan koma):</b></label><br>
+            <input type="text" id="pNames" placeholder="Contoh: Andi, Budi, Siti" style="width: 100%;" value="Pemain 1, Pemain 2">
+            <br><br>
             
-            <label>Input Soal (Format: Pertanyaan | Pilihan A, Pilihan B, Pilihan C | Indeks Jawaban Benar 0-2)</label><br>
-            <small>Gunakan tanda "|" untuk memisahkan. Satu soal per baris.</small>
+            <label><b>2. Input Soal:</b></label><br>
+            <small>Format: Pertanyaan | Opsi A, Opsi B, Opsi C | Nomor Jawaban Benar (0-2)</small>
             <textarea id="soalInput">
-Siapa penemu lampu pijar? |. Thomas Edison, Newton, Einstein | 0
-Ibu kota Indonesia? |. Surabaya, Jakarta, Bandung | 1
-25 x 4? |. 50, 80, 100 | 2
-Apa simbol Kimia Air? |. H2O, CO2, O2 | 0
-            </textarea>
+Siapa penemu lampu pijar? | Thomas Edison, Newton, Einstein | 0
+Ibu kota Indonesia? | Surabaya, Jakarta, Bandung | 1
+25 x 4? | 50, 80, 100 | 2
+Apa simbol Kimia Air? | H2O, CO2, O2 | 0</textarea>
             <br><br>
             <button onclick="mulaiGame()">🚀 Simpan & Mulai Petualangan</button>
         </div>
@@ -46,7 +47,6 @@ Apa simbol Kimia Air? |. H2O, CO2, O2 | 0
 
     <div id="game-area" class="hidden">
         <div class="map-area" id="map-tracks"></div>
-        
         <div class="q-card">
             <h2 id="turn-label">Giliran: -</h2>
             <p id="question-text" style="font-size: 20px;">Memuat soal...</p>
@@ -68,28 +68,38 @@ Apa simbol Kimia Air? |. H2O, CO2, O2 | 0
     let currentTurn = 0;
 
     function mulaiGame() {
-        const names = document.getElementById('pNames').value;
-        const rawSoal = document.getElementById('soalInput').value.trim().split('\n');
+        const namesInput = document.getElementById('pNames').value;
+        const soalLines = document.getElementById('soalInput').value.trim().split('\n');
         
-        if(!names) return alert("Masukkan nama pemain dulu!");
-        if(rawSoal.length < 1) return alert("Masukkan minimal 1 soal!");
+        if(!namesInput.trim()) return alert("Tuliskan nama pemain dulu!");
 
-        // Proses input soal
-        gameQuestions = rawSoal.map(line => {
-            const parts = line.split('|');
-            return {
-                q: parts[0].trim(),
-                a: parts[1].split(',').map(opt => opt.trim()),
-                k: parseInt(parts[2].trim())
-            };
-        });
+        // Reset data soal
+        gameQuestions = [];
 
-        // Proses input pemain
-        players = names.split(',').map((n, i) => ({
+        // Validasi input soal agar tidak error
+        for (let line of soalLines) {
+            if (line.includes('|')) {
+                const parts = line.split('|');
+                if (parts.length >= 3) {
+                    gameQuestions.push({
+                        q: parts[0].trim(),
+                        a: parts[1].split(',').map(opt => opt.trim()),
+                        k: parseInt(parts[2].trim())
+                    });
+                }
+            }
+        }
+
+        if(gameQuestions.length === 0) {
+            return alert("Format soal salah! Pastikan gunakan tanda | sebagai pemisah.");
+        }
+
+        // Setup Pemain
+        players = namesInput.split(',').map((n, i) => ({
             nama: n.trim(),
             pos: 0,
             avatar: AVATARS[i % AVATARS.length]
-        }));
+        })).filter(p => p.nama !== "");
 
         document.getElementById('setup-area').classList.add('hidden');
         document.getElementById('game-area').classList.remove('hidden');
@@ -104,9 +114,10 @@ Apa simbol Kimia Air? |. H2O, CO2, O2 | 0
         players.forEach(p => {
             const track = document.createElement('div');
             track.className = 'track';
-            const posPercent = (p.pos / gameQuestions.length) * 88;
+            // Hitung posisi robot dalam persen
+            const progress = (p.pos / gameQuestions.length) * 85;
             track.innerHTML = `
-                <div class="robot" style="left: calc(${posPercent}% + 10px)">
+                <div class="robot" style="left: ${progress}%">
                     ${p.avatar}
                     <span>${p.nama}</span>
                 </div>
@@ -137,25 +148,24 @@ Apa simbol Kimia Air? |. H2O, CO2, O2 | 0
     function cekJawaban(index, kunci) {
         const p = players[currentTurn];
         if(index === kunci) {
-            alert("✅ BENAR! Robotmu meluncur maju!");
+            alert("✅ BENAR! Robot " + p.nama + " maju!");
             p.pos++;
             updatePeta();
             
             if(p.pos >= gameQuestions.length) {
                 document.getElementById('game-area').classList.add('hidden');
                 document.getElementById('win-area').classList.remove('hidden');
-                document.getElementById('winner-name').innerText = SELAMAT ${p.nama.toUpperCase()}! Kamu Juara Mapel Ini!;
+                document.getElementById('winner-name').innerText = SELAMAT ${p.nama.toUpperCase()}! Kamu Juara!;
                 return;
             }
         } else {
-            alert("❌ SALAH! Kamu tertahan di posisi ini.");
+            alert("❌ SALAH! Robot mogok...");
         }
 
+        // Ganti giliran ke pemain berikutnya
         currentTurn = (currentTurn + 1) % players.length;
         tampilkanSoal();
     }
 </script>
 </body>
 </html>
-
-
