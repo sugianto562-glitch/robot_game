@@ -3,190 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Robot Mega-Adventure: 50 Soal Mapel</title>
+    <title>Robot Game 50 Soal</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f9ff; padding: 20px; text-align: center; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .form-box { background: #f8fafc; padding: 20px; border-radius: 15px; border: 2px solid #3b82f6; text-align: left; margin-bottom: 20px; }
-        label { font-weight: bold; display: block; margin-bottom: 5px; color: #1e293b; }
-        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; box-sizing: border-box; }
-        .track-container { background: #fff; padding: 10px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #e2e8f0; max-height: 400px; overflow-y: auto; }
-        .track { background: #f1f5f9; height: 60px; margin: 10px 0; border-radius: 30px; position: relative; display: flex; align-items: center; border: 1px solid #ddd; }
-        .robot { font-size: 30px; position: absolute; transition: 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); left: 10px; display: flex; flex-direction: column; align-items: center; z-index: 10; }
-        .robot span { font-size: 9px; font-weight: bold; background: white; padding: 1px 4px; border-radius: 4px; border: 1px solid #ccc; margin-top: -5px; }
-        .q-card { background: #3b82f6; color: white; padding: 25px; border-radius: 15px; min-height: 200px; }
-        .btn-start { background: #3b82f6; color: white; width: 100%; font-size: 18px; padding: 15px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; }
-        .btn-opt { background: white; color: #3b82f6; margin: 8px; min-width: 140px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .btn-opt:hover { background: #dbeafe; transform: translateY(-2px); }
+        body { font-family: sans-serif; background: #e0f2fe; text-align: center; padding: 20px; }
+        .box { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 15px; shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        input { width: 80%; padding: 10px; margin: 10px; border-radius: 5px; border: 1px solid #ccc; }
+        button { padding: 10px 20px; cursor: pointer; background: #3b82f6; color: white; border: none; border-radius: 5px; font-weight: bold; }
+        .track { background: #f1f5f9; height: 50px; margin: 10px 0; border-radius: 25px; position: relative; border: 1px solid #ddd; }
+        .robot { position: absolute; font-size: 25px; transition: 0.5s; left: 0; top: 5px; }
         .hidden { display: none; }
-        .stats { font-size: 14px; margin-bottom: 10px; color: #64748b; }
+        .q-box { background: #3b82f6; color: white; padding: 20px; border-radius: 10px; margin-top: 20px; }
+        .opt { background: white; color: #3b82f6; margin: 5px; padding: 10px; border-radius: 5px; display: inline-block; cursor: pointer; width: 80%; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>🚀 Robot Mega-Adventure</h1>
-    <p>Selesaikan 50 Misi dari Semua Mata Pelajaran!</p>
-
-    <div id="setup-area">
-        <div class="form-box">
-            <label>Masukkan Nama Pemain (pisahkan dengan koma):</label>
-            <input type="text" id="pNames" placeholder="Contoh: Budi, Iwan, Siti" value="Pemain 1, Pemain 2">
-        </div>
-        <button class="btn-start" onclick="mulaiGame()">Mulai Petualangan 50 Soal 🏁</button>
+<div class="box">
+    <h1>🤖 Robot Adventure</h1>
+    
+    <div id="setup">
+        <p>Masukkan Nama Pemain (pisah dengan koma):</p>
+        <input type="text" id="names" value="Player 1, Player 2">
+        <br>
+        <button onclick="start()">MULAI GAME</button>
     </div>
 
-    <div id="game-area" class="hidden">
-        <div class="stats" id="soal-progress">Misi ke-1 dari 50</div>
-        <div class="track-container" id="map-tracks"></div>
-        <div class="q-card">
-            <h3 id="turn-label"></h3>
-            <p id="question-text" style="font-size: 18px; font-weight: bold;"></p>
-            <div id="options-buttons"></div>
+    <div id="game" class="hidden">
+        <div id="tracks"></div>
+        <div class="q-box">
+            <h3 id="turn"></h3>
+            <p id="question"></p>
+            <div id="options"></div>
         </div>
-    </div>
-
-    <div id="win-area" class="hidden">
-        <h1 style="font-size: 80px;">👑</h1>
-        <h2 id="winner-name"></h2>
-        <button class="btn-start" onclick="location.reload()">Main Lagi</button>
     </div>
 </div>
 
 <script>
-    const SEMUA_SOAL = [
-        // --- MATEMATIKA (10) ---
-        { q: "(MTK) Hasil dari 150 + 250 adalah...", a: ["350", "400", "450"], k: 1 },
-        { q: "(MTK) 8 x 7 adalah...", a: ["54", "56", "58"], k: 1 },
-        { q: "(MTK) Bangun datar yang memiliki 3 sisi adalah...", a: ["Segitiga", "Persegi", "Lingkaran"], k: 0 },
-        { q: "(MTK) Akar kuadrat dari 64 adalah...", a: ["6", "7", "8"], k: 2 },
-        { q: "(MTK) 100 dibagi 4 adalah...", a: ["20", "25", "30"], k: 1 },
-        { q: "(MTK) Berapa jumlah sudut pada persegi?", a: ["4", "5", "6"], k: 0 },
-        { q: "(MTK) 1 jam sama dengan berapa menit?", a: ["30", "60", "120"], k: 1 },
-        { q: "(MTK) Hasil dari 10 - 2 x 3 adalah...", a: ["24", "4", "8"], k: 1 },
-        { q: "(MTK) Bilangan ganjil setelah 13 adalah...", a: ["14", "15", "17"], k: 1 },
-        { q: "(MTK) 0,5 jika dijadikan persen adalah...", a: ["5%", "50%", "500%"], k: 1 },
-
-        // --- IPA (10) ---
-        { q: "(IPA) Bagian tumbuhan yang menyerap air adalah...", a: ["Daun", "Batang", "Akar"], k: 2 },
-        { q: "(IPA) Hewan yang hidup di air dan darat disebut...", a: ["Amfibi", "Mamalia", "Reptil"], k: 0 },
-        { q: "(IPA) Pusat tata surya kita adalah...", a: ["Bumi", "Bulan", "Matahari"], k: 2 },
-        { q: "(IPA) Benda padat menjadi cair disebut...", a: ["Menguap", "Mencair", "Membeku"], k: 1 },
-        { q: "(IPA) Alat pernapasan pada ikan adalah...", a: ["Paru-paru", "Insang", "Kulit"], k: 1 },
-        { q: "(IPA) Sumber energi terbesar bagi bumi adalah...", a: ["Listrik", "Matahari", "Angin"], k: 1 },
-        { q: "(IPA) Planet merah adalah julukan untuk...", a: ["Venus", "Mars", "Saturnus"], k: 1 },
-        { q: "(IPA) Contoh gaya tarik adalah...", a: ["Mendorong mobil", "Membuka pintu", "Menendang bola"], k: 1 },
-        { q: "(IPA) Urutan pertumbuhan manusia setelah bayi adalah...", a: ["Remaja", "Balita", "Dewasa"], k: 1 },
-        { q: "(IPA) Cahaya dapat dipantulkan jika mengenai...", a: ["Tembok", "Kaca spion/Cermin", "Kain"], k: 1 },
-
-        // --- IPS (10) ---
-        { q: "(IPS) Candi Borobudur terletak di provinsi...", a: ["Jawa Barat", "Jawa Tengah", "Jawa Timur"], k: 1 },
-        { q: "(IPS) Mata uang negara Indonesia adalah...", a: ["Ringgit", "Rupiah", "Dollar"], k: 1 },
-        { q: "(IPS) Ibukota negara Jepang adalah...", a: ["Seoul", "Beijing", "Tokyo"], k: 2 },
-        { q: "(IPS) Rumah adat Minangkabau disebut...", a: ["Joglo", "Gadang", "Honai"], k: 1 },
-        { q: "(IPS) Presiden pertama Republik Indonesia adalah...", a: ["Soeharto", "Soekarno", "BJ Habibie"], k: 1 },
-        { q: "(IPS) Semboyan bangsa Indonesia adalah...", a: ["Tut Wuri Handayani", "Bhinneka Tunggal Ika", "Ing Ngarsa Sung Tulada"], k: 1 },
-        { q: "(IPS) Benua terkecil di dunia adalah...", a: ["Asia", "Eropa", "Australia"], k: 2 },
-        { q: "(IPS) Lagu kebangsaan Indonesia adalah...", a: ["Indonesia Raya", "Indonesia Pusaka", "Tanah Airku"], k: 0 },
-        { q: "(IPS) Penjajah yang paling lama di Indonesia adalah...", a: ["Jepang", "Belanda", "Inggris"], k: 1 },
-        { q: "(IPS) Negara tetangga Indonesia yang berbentuk kerajaan adalah...", a: ["Singapura", "Malaysia", "Filipina"], k: 1 },
-
-        // --- B. INDONESIA (10) ---
-        { q: "(B.Indo) Lawan kata dari 'Luas' adalah...", a: ["Lebar", "Sempit", "Besar"], k: 1 },
-        { q: "(B.Indo) Tokoh utama dalam cerita disebut...", a: ["Protagonis", "Antagonis", "Figuran"], k: 0 },
-        { q: "(B.Indo) Persamaan kata (sinonim) dari 'Pintar' adalah...", a: ["Bodoh", "Pandai", "Rajin"], k: 1 },
-        { q: "(B.Indo) Tanda baca untuk mengakhiri kalimat tanya adalah...", a: ["Titik (.)", "Koma (,)", "Tanya (?)"], k: 2 },
-        { q: "(B.Indo) Peribahasa 'Besar pasak daripada...'?", a: ["Kayu", "Tiang", "Tiang"], k: 1 },
-        { q: "(B.Indo) Kata dasar dari 'Berjalan' adalah...", a: ["Jalan", "Lari", "Berja"], k: 0 },
-        { q: "(B.Indo) Puisi lama yang bersajak a-b-a-b disebut...", a: ["Pantun", "Prosa", "Cerpen"], k: 0 },
-        { q: "(B.Indo) Singkatan dari SD adalah...", a: ["Sekolah Desa", "Sekolah Dasar", "Sekolah Dalam"], k: 1 },
-        { q: "(B.Indo) Huruf kapital digunakan di...", a: ["Akhir kalimat", "Awal nama orang", "Setelah koma"], k: 1 },
-        { q: "(B.Indo) Buku adalah jendela...", a: ["Rumah", "Dunia", "Kamar"], k: 1 },
-
-        // --- B. INGGRIS (10) ---
-        { q: "(English) 'Apple' in Bahasa Indonesia is...", a: ["Anggur", "Apel", "Jeruk"], k: 1 },
-        { q: "(English) The color of the sky is...", a: ["Red", "Green", "Blue"], k: 2 },
-        { q: "(English) 'Good Morning' means...", a: ["Selamat Pagi", "Selamat Siang", "Selamat Malam"], k: 0 },
-        { q: "(English) One, Two, Three, ...?", a: ["Four", "Five", "Six"], k: 0 },
-        { q: "(English) An animal that barks is a...", a: ["Cat", "Dog", "Bird"], k: 1 },
-        { q: "(English) I ... a student.", a: ["is", "am", "are"], k: 1 },
-        { q: "(English) 'Father' means...", a: ["Ibu", "Ayah", "Kakek"], k: 1 },
-        { q: "(English) What is 'Buku' in English?", a: ["Pen", "Pencil", "Book"], k: 2 },
-        { q: "(English) 'Thank you' response is...", a: ["You are welcome", "Goodbye", "Hello"], k: 0 },
-        { q: "(English) 'Sunday' is hari...", a: ["Sabtu", "Minggu", "Senin"], k: 1 }
+    const soal = [
+        { q: "1 + 1 = ...", a: ["2", "3", "4"], k: 0 },
+        { q: "Ibu kota Indonesia?", a: ["Bandung", "Jakarta", "Medan"], k: 1 },
+        { q: "Warna pisang matang?", a: ["Merah", "Kuning", "Biru"], k: 1 },
+        { q: "Hewan yang melompat?", a: ["Katak", "Ular", "Ikan"], k: 0 },
+        { q: "Hasil 10 x 5?", a: ["40", "50", "60"], k: 1 }
     ];
 
     let players = [];
-    let currentTurn = 0;
-    const AVATARS = ["🤖", "🦾", "🦿", "🛰️", "🛸", "👾"];
+    let turn = 0;
 
-    function mulaiGame() {
-        const names = document.getElementById('pNames').value;
-        if(!names.trim()) return alert("Masukkan nama pemain!");
-
-        players = names.split(',').map((n, i) => ({
-            nama: n.trim(),
-            pos: 0,
-            avatar: AVATARS[i % AVATARS.length]
-        })).filter(p => p.nama !== "");
-
-        document.getElementById('setup-area').classList.add('hidden');
-        document.getElementById('game-area').classList.remove('hidden');
-        updatePeta();
-        tampilkanSoal();
+    function start() {
+        let input = document.getElementById('names').value;
+        if(!input) return alert("Isi nama!");
+        
+        players = input.split(',').map(n => ({ nama: n.trim(), pos: 0 }));
+        document.getElementById('setup').classList.add('hidden');
+        document.getElementById('game').classList.remove('hidden');
+        
+        drawTracks();
+        showSoal();
     }
 
-    function updatePeta() {
-        const container = document.getElementById('map-tracks');
-        container.innerHTML = '';
+    function drawTracks() {
+        let h = '';
         players.forEach(p => {
-            const track = document.createElement('div');
-            track.className = 'track';
-            const progress = (p.pos / SEMUA_SOAL.length) * 92;
-            track.innerHTML = `
-                <div class="robot" style="left: ${progress}%">${p.avatar}<span>${p.nama}</span></div>
-                <div style="position:absolute; right:15px; font-size:20px;">🏁</div>
-            `;
-            container.appendChild(track);
+            let move = (p.pos / soal.length) * 90;
+            h += <div class="track"><div class="robot" style="left:${move}%">🤖<small>${p.nama}</small></div></div>;
         });
+        document.getElementById('tracks').innerHTML = h;
     }
 
-    function tampilkanSoal() {
-        const p = players[currentTurn];
-        const soal = SEMUA_SOAL[p.pos];
+    function showSoal() {
+        let p = players[turn];
+        let s = soal[p.pos];
+        document.getElementById('turn').innerText = "Giliran: " + p.nama;
+        document.getElementById('question').innerText = s.q;
         
-        document.getElementById('soal-progress').innerText = Misi ke-${p.pos + 1} dari ${SEMUA_SOAL.length};
-        document.getElementById('turn-label').innerText = Giliran: ${p.nama} ${p.avatar};
-        document.getElementById('question-text').innerText = soal.q;
-        
-        const btnCont = document.getElementById('options-buttons');
-        btnCont.innerHTML = '';
-        soal.a.forEach((opt, i) => {
-            const btn = document.createElement('button');
-            btn.className = 'btn-opt';
-            btn.innerText = opt;
-            btn.onclick = () => {
-                if(i === soal.k) {
-                    p.pos++;
-                    updatePeta();
-                    if(p.pos >= SEMUA_SOAL.length) {
-                        document.getElementById('game-area').classList.add('hidden');
-                        document.getElementById('win-area').classList.remove('hidden');
-                        document.getElementById('winner-name').innerText = 🏆 ${p.nama.toUpperCase()} TELAH MENYELESAIKAN SEMUA MISI!;
-                        return;
-                    }
-                } else {
-                    alert("Opps! Jawaban salah. Robot berhenti sejenak.");
-                }
-                currentTurn = (currentTurn + 1) % players.length;
-                tampilkanSoal();
-            };
-            btnCont.appendChild(btn);
+        let optH = '';
+        s.a.forEach((o, i) => {
+            optH += <div class="opt" onclick="cek(${i})">${o}</div>;
         });
+        document.getElementById('options').innerHTML = optH;
+    }
+
+    function cek(idx) {
+        let p = players[turn];
+        if(idx === soal[p.pos].k) {
+            alert("BENAR!");
+            p.pos++;
+            drawTracks();
+            if(p.pos >= soal.length) {
+                alert(p.nama + " MENANG!");
+                location.reload();
+                return;
+            }
+        } else {
+            alert("SALAH!");
+        }
+        turn = (turn + 1) % players.length;
+        showSoal();
     }
 </script>
 </body>
 </html>
-
-
-
