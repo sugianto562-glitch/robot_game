@@ -3,17 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Robot Game 50 Soal</title>
+    <title>Robot Adventure - 60 Soal Lengkap</title>
     <style>
-        body { font-family: sans-serif; background: #e0f2fe; text-align: center; padding: 20px; }
-        .box { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 15px; shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        input { width: 80%; padding: 10px; margin: 10px; border-radius: 5px; border: 1px solid #ccc; }
-        button { padding: 10px 20px; cursor: pointer; background: #3b82f6; color: white; border: none; border-radius: 5px; font-weight: bold; }
-        .track { background: #f1f5f9; height: 50px; margin: 10px 0; border-radius: 25px; position: relative; border: 1px solid #ddd; }
-        .robot { position: absolute; font-size: 25px; transition: 0.5s; left: 0; top: 5px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #e0f2fe; text-align: center; padding: 20px; margin: 0; }
+        .box { max-width: 700px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        input { width: 80%; padding: 12px; margin: 10px; border-radius: 8px; border: 2px solid #3b82f6; font-size: 16px; }
+        button { padding: 12px 25px; cursor: pointer; background: #3b82f6; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; }
+        .track { background: #f1f5f9; height: 60px; margin: 10px 0; border-radius: 30px; position: relative; border: 1px solid #cbd5e1; display: flex; align-items: center; overflow: hidden; }
+        .robot { position: absolute; font-size: 30px; transition: 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); left: 0; display: flex; flex-direction: column; align-items: center; z-index: 5; }
+        .robot small { font-size: 10px; background: white; padding: 2px 5px; border-radius: 5px; border: 1px solid #ccc; margin-top: -5px; }
         .hidden { display: none; }
-        .q-box { background: #3b82f6; color: white; padding: 20px; border-radius: 10px; margin-top: 20px; }
-        .opt { background: white; color: #3b82f6; margin: 5px; padding: 10px; border-radius: 5px; display: inline-block; cursor: pointer; width: 80%; font-weight: bold; }
+        .q-box { background: #3b82f6; color: white; padding: 20px; border-radius: 15px; margin-top: 20px; }
+        .opt { background: white; color: #3b82f6; margin: 8px auto; padding: 12px; border-radius: 8px; cursor: pointer; width: 90%; font-weight: bold; transition: 0.2s; border: 2px solid white; }
+        .opt:hover { background: #dbeafe; border: 2px solid #3b82f6; }
+        .progress-text { font-size: 14px; color: #64748b; margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -22,84 +25,162 @@
     <h1>🤖 Robot Adventure</h1>
     
     <div id="setup">
-        <p>Masukkan Nama Pemain (pisah dengan koma):</p>
-        <input type="text" id="names" value="Player 1, Player 2">
+        <p>Masukkan Nama Pemain (pisahkan dengan koma):</p>
+        <input type="text" id="names" value="Sugi, Andi, Sukri">
         <br>
-        <button onclick="start()">MULAI GAME</button>
+        <button onclick="start()">🚀 MULAI PETUALANGAN (60 SOAL)</button>
     </div>
 
     <div id="game" class="hidden">
+        <div class="progress-text" id="p-info">Soal 1 dari 60</div>
         <div id="tracks"></div>
         <div class="q-box">
             <h3 id="turn"></h3>
-            <p id="question"></p>
+            <p id="question" style="font-size: 18px; min-height: 50px;"></p>
             <div id="options"></div>
         </div>
+    </div>
+
+    <div id="win" class="hidden">
+        <h1 style="font-size: 60px;">🏆</h1>
+        <h2 id="winner-name"></h2>
+        <button onclick="location.reload()">🔄 Main Lagi</button>
     </div>
 </div>
 
 <script>
-    const soal = [
-        { q: "1 + 1 = ...", a: ["2", "3", "4"], k: 0 },
-        { q: "Ibu kota Indonesia?", a: ["Bandung", "Jakarta", "Medan"], k: 1 },
-        { q: "Warna pisang matang?", a: ["Merah", "Kuning", "Biru"], k: 1 },
-        { q: "Hewan yang melompat?", a: ["Katak", "Ular", "Ikan"], k: 0 },
-        { q: "Hasil 10 x 5?", a: ["40", "50", "60"], k: 1 }
+    const daftarSoal = [
+        // MTK (10)
+        { q: "(MTK) 150 + 250 = ?", a: ["350", "400", "450"], k: 1 },
+        { q: "(MTK) 8 x 7 = ?", a: ["54", "56", "58"], k: 1 },
+        { q: "(MTK) Sisi pada segitiga ada ?", a: ["3", "4", "5"], k: 0 },
+        { q: "(MTK) Akar dari 64 ?", a: ["6", "7", "8"], k: 2 },
+        { q: "(MTK) 100 : 4 = ?", a: ["20", "25", "30"], k: 1 },
+        { q: "(MTK) Menit dalam 1 jam ?", a: ["30", "60", "90"], k: 1 },
+        { q: "(MTK) Sudut pada persegi ?", a: ["4", "5", "6"], k: 0 },
+        { q: "(MTK) 10 - 2 x 3 ?", a: ["24", "4", "8"], k: 1 },
+        { q: "(MTK) Bilangan ganjil setelah 13 ?", a: ["14", "15", "17"], k: 1 },
+        { q: "(MTK) 0,5 dalam persen ?", a: ["5%", "50%", "500%"], k: 1 },
+        // IPA (10)
+        { q: "(IPA) Bagian pohon yang menyerap air ?", a: ["Daun", "Batang", "Akar"], k: 2 },
+        { q: "(IPA) Hewan air & darat ?", a: ["Amfibi", "Mamalia", "Reptil"], k: 0 },
+        { q: "(IPA) Pusat Tata Surya ?", a: ["Bumi", "Matahari", "Bulan"], k: 1 },
+        { q: "(IPA) Benda padat jadi cair ?", a: ["Menguap", "Mencair", "Membeku"], k: 1 },
+        { q: "(IPA) Ikan bernapas dengan ?", a: ["Paru-paru", "Insang", "Kulit"], k: 1 },
+        { q: "(IPA) Planet Merah adalah ?", a: ["Venus", "Mars", "Saturnus"], k: 1 },
+        { q: "(IPA) Contoh gaya tarik ?", a: ["Dorong meja", "Tarik pintu", "Tendang bola"], k: 1 },
+        { q: "(IPA) Manusia bernapas hirup ?", a: ["Oksigen", "Nitrogen", "Karbon"], k: 0 },
+        { q: "(IPA) Matahari terbit di ?", a: ["Barat", "Utara", "Timur"], k: 2 },
+        { q: "(IPA) Alat ukur suhu ?", a: ["Mistar", "Termometer", "Kompas"], k: 1 },
+        // IPS (10)
+        { q: "(IPS) Candi Borobudur di ?", a: ["Jabar", "Jateng", "Jatim"], k: 1 },
+        { q: "(IPS) Mata uang Indonesia ?", a: ["Ringgit", "Rupiah", "Dollar"], k: 1 },
+        { q: "(IPS) Ibukota Jepang ?", a: ["Seoul", "Beijing", "Tokyo"], k: 2 },
+        { q: "(IPS) Presiden RI ke-1 ?", a: ["Soeharto", "Soekarno", "Habibie"], k: 1 },
+        { q: "(IPS) Benua terkecil ?", a: ["Asia", "Eropa", "Australia"], k: 2 },
+        { q: "(IPS) Semboyan Indonesia ?", a: ["Bhinneka Tunggal Ika", "Tut Wuri", "Merdeka"], k: 0 },
+        { q: "(IPS) Rumah adat Papua ?", a: ["Joglo", "Gadang", "Honai"], k: 2 },
+        { q: "(IPS) Samudra terluas ?", a: ["Hindia", "Atlantik", "Pasifik"], k: 2 },
+        { q: "(IPS) Pahlawan Emansipasi ?", a: ["Kartini", "Diponegoro", "Sudirman"], k: 0 },
+        { q: "(IPS) Indonesia merdeka tahun ?", a: ["1942", "1945", "1950"], k: 1 },
+        // B. INDO (10)
+        { q: "(B.Indo) Lawan kata Luas ?", a: ["Lebar", "Sempit", "Besar"], k: 1 },
+        { q: "(B.Indo) Sinonim Pintar ?", a: ["Bodoh", "Pandai", "Rajin"], k: 1 },
+        { q: "(B.Indo) Tanda tanya digunakan untuk ?", a: ["Perintah", "Tanya", "Berhenti"], k: 1 },
+        { q: "(B.Indo) Kata dasar Berjalan ?", a: ["Jalan", "Lari", "Berja"], k: 0 },
+        { q: "(B.Indo) Buku adalah jendela ... ?", a: ["Rumah", "Dunia", "Kamar"], k: 1 },
+        { q: "(B.Indo) Singkatan SD ?", a: ["Sekolah Desa", "Sekolah Dasar", "Sekolah Dalam"], k: 1 },
+        { q: "(B.Indo) Cerita rakyat fiktif ?", a: ["Dongeng", "Berita", "Koran"], k: 0 },
+        { q: "(B.Indo) Pantun bersajak ?", a: ["a-a-a-a", "a-b-a-b", "bebas"], k: 1 },
+        { q: "(B.Indo) Ibu memasak di ... ?", a: ["Kamar", "Dapur", "Taman"], k: 1 },
+        { q: "(B.Indo) Huruf kapital di ... ?", a: ["Akhir", "Awal nama", "Tengah"], k: 1 },
+        // ENGLISH (10)
+        { q: "(English) Color of Grass ?", a: ["Red", "Blue", "Green"], k: 2 },
+        { q: "(English) 'Apple' in Indonesia ?", a: ["Apel", "Jeruk", "Anggur"], k: 0 },
+        { q: "(English) 'Good Morning' ?", a: ["Pagi", "Siang", "Malam"], k: 0 },
+        { q: "(English) One, Two, ... ?", a: ["Four", "Three", "Five"], k: 1 },
+        { q: "(English) Animal that meows ?", a: ["Dog", "Cat", "Bird"], k: 1 },
+        { q: "(English) I ... a student.", a: ["is", "am", "are"], k: 1 },
+        { q: "(English) 'Father' is ?", a: ["Ibu", "Ayah", "Kakek"], k: 1 },
+        { q: "(English) 'Book' is ?", a: ["Buku", "Pensil", "Tas"], k: 0 },
+        { q: "(English) 'Sunday' is hari ?", a: ["Sabtu", "Minggu", "Senin"], k: 1 },
+        { q: "(English) 'Thank you' means ?", a: ["Halo", "Maaf", "Terima kasih"], k: 2 },
+        // PJOK (10)
+        { q: "(PJOK) Berapa jumlah pemain sepak bola tiap tim?", a: ["5", "11", "22"], k: 1 },
+        { q: "(PJOK) Gerakan lari, lompat, dan lempar termasuk cabang...?", a: ["Atletik", "Senam", "Bela diri"], k: 0 },
+        { q: "(PJOK) Memukul bola kasti menggunakan...?", a: ["Raket", "Tongkat pemukul", "Tangan"], k: 1 },
+        { q: "(PJOK) Induk organisasi sepak bola Indonesia adalah...?", a: ["PBSI", "PSSI", "PERBASI"], k: 1 },
+        { q: "(PJOK) Gerakan berguling ke depan dilakukan di atas...?", a: ["Tanah", "Lantai", "Matras"], k: 2 },
+        { q: "(PJOK) Pemanasan dilakukan sebelum olahraga bertujuan untuk...?", a: ["Mencegah cedera", "Biar cepat lelah", "Menambah beban"], k: 0 },
+        { q: "(PJOK) Berapa jumlah pemain bola basket dalam satu tim?", a: ["5", "6", "11"], k: 0 },
+        { q: "(PJOK) Renang gaya katak disebut juga gaya...?", a: ["Bebas", "Punggung", "Dada"], k: 2 },
+        { q: "(PJOK) Memasukkan bola ke keranjang basket disebut...?", a: ["Smash", "Shooting", "Service"], k: 1 },
+        { q: "(PJOK) Posisi tidur telentang lalu mengangkat tubuh disebut...?", a: ["Push up", "Sit up", "Back up"], k: 1 }
     ];
 
-    let players = [];
-    let turn = 0;
+    let pemain = [];
+    let giliran = 0;
+    const AVATARS = ["🤖", "🦾", "🛰️", "🛸", "👾"];
 
     function start() {
         let input = document.getElementById('names').value;
-        if(!input) return alert("Isi nama!");
+        if(!input.trim()) return alert("Masukkan nama!");
         
-        players = input.split(',').map(n => ({ nama: n.trim(), pos: 0 }));
+        pemain = input.split(',').map((n, i) => ({ 
+            nama: n.trim(), 
+            pos: 0, 
+            ava: AVATARS[i % AVATARS.length] 
+        })).filter(p => p.nama !== "");
+
         document.getElementById('setup').classList.add('hidden');
         document.getElementById('game').classList.remove('hidden');
         
-        drawTracks();
-        showSoal();
+        cetakPeta();
+        tampilSoal();
     }
 
-    function drawTracks() {
+    function cetakPeta() {
         let h = '';
-        players.forEach(p => {
-            let move = (p.pos / soal.length) * 90;
-            h += <div class="track"><div class="robot" style="left:${move}%">🤖<small>${p.nama}</small></div></div>;
+        pemain.forEach(p => {
+            let jark = (p.pos / daftarSoal.length) * 92;
+            h += `<div class="track">
+                    <div class="robot" style="left:${jark}%">${p.ava}<small>${p.nama}</small></div>
+                    <div style="position:absolute; right:10px;">🏁</div>
+                  </div>`;
         });
         document.getElementById('tracks').innerHTML = h;
     }
 
-    function showSoal() {
-        let p = players[turn];
-        let s = soal[p.pos];
-        document.getElementById('turn').innerText = "Giliran: " + p.nama;
+    function tampilSoal() {
+        let p = pemain[giliran];
+        let s = daftarSoal[p.pos];
+        document.getElementById('p-info').innerText = Misi ke-${p.pos + 1} dari ${daftarSoal.length};
+        document.getElementById('turn').innerText = "Giliran: " + p.nama + " " + p.ava;
         document.getElementById('question').innerText = s.q;
         
         let optH = '';
         s.a.forEach((o, i) => {
-            optH += <div class="opt" onclick="cek(${i})">${o}</div>;
+            optH += <div class="opt" onclick="jawab(${i})">${o}</div>;
         });
         document.getElementById('options').innerHTML = optH;
     }
 
-    function cek(idx) {
-        let p = players[turn];
-        if(idx === soal[p.pos].k) {
-            alert("BENAR!");
+    function jawab(idx) {
+        let p = pemain[giliran];
+        if(idx === daftarSoal[p.pos].k) {
             p.pos++;
-            drawTracks();
-            if(p.pos >= soal.length) {
-                alert(p.nama + " MENANG!");
-                location.reload();
+            cetakPeta();
+            if(p.pos >= daftarSoal.length) {
+                document.getElementById('game').classList.add('hidden');
+                document.getElementById('win').classList.remove('hidden');
+                document.getElementById('winner-name').innerText = p.nama + " MENANG!";
                 return;
             }
         } else {
-            alert("SALAH!");
+            alert("SALAH! Robot berhenti sejenak.");
         }
-        turn = (turn + 1) % players.length;
-        showSoal();
+        giliran = (giliran + 1) % pemain.length;
+        tampilSoal();
     }
 </script>
 </body>
