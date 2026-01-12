@@ -3,99 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Robot Multi-Mapel Adventure - Fixed</title>
+    <title>Robot Edukasi - Input Mudah</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f9ff; text-align: center; padding: 20px; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .admin-box { background: #f8fafc; padding: 20px; border-radius: 15px; border: 2px solid #3b82f6; margin-bottom: 20px; text-align: left; }
-        .map-area { background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #e2e8f0; min-height: 100px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f9ff; padding: 20px; text-align: center; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        
+        /* Form Styling */
+        .form-box { background: #f8fafc; padding: 20px; border-radius: 15px; border: 2px solid #3b82f6; text-align: left; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { font-weight: bold; display: block; margin-bottom: 5px; color: #1e293b; }
+        input, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; box-sizing: border-box; }
+        
+        .soal-list { margin-top: 15px; border-top: 1px solid #ddd; padding-top: 10px; max-height: 200px; overflow-y: auto; }
+        .soal-item { background: #e0f2fe; padding: 8px; margin-bottom: 5px; border-radius: 5px; font-size: 14px; }
+
+        /* Arena Game */
         .track { background: #f1f5f9; height: 70px; margin: 15px 0; border-radius: 35px; position: relative; display: flex; align-items: center; border: 1px solid #ddd; }
-        .robot { font-size: 35px; position: absolute; transition: 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); left: 20px; z-index: 2; display: flex; flex-direction: column; align-items: center; }
-        .robot span { font-size: 11px; font-weight: bold; background: white; padding: 2px 5px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); color: #333; }
-        .finish { position: absolute; right: 20px; font-weight: bold; color: #ef4444; }
-        .q-card { background: #3b82f6; color: white; padding: 30px; border-radius: 20px; box-shadow: 0 4px 15px rgba(59,130,246,0.4); }
-        button { background: #3b82f6; color: white; border: none; padding: 12px 25px; margin: 8px; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        button:hover { background: #2563eb; transform: scale(1.05); }
+        .robot { font-size: 35px; position: absolute; transition: 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); left: 10px; display: flex; flex-direction: column; align-items: center; }
+        .robot span { font-size: 10px; font-weight: bold; background: white; padding: 1px 5px; border-radius: 4px; border: 1px solid #ccc; }
+        
+        .q-card { background: #3b82f6; color: white; padding: 25px; border-radius: 15px; }
+        button { cursor: pointer; font-weight: bold; transition: 0.3s; padding: 10px 20px; border-radius: 8px; border: none; }
+        .btn-add { background: #10b981; color: white; margin-top: 10px; }
+        .btn-start { background: #3b82f6; color: white; width: 100%; font-size: 18px; margin-top: 20px; }
+        .btn-opt { background: white; color: #3b82f6; margin: 5px; min-width: 120px; }
+        
         .hidden { display: none; }
-        textarea { width: 100%; height: 120px; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1; font-family: monospace; box-sizing: border-box; }
-        input { padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; margin: 5px 0; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>🤖 Robot Multi-Mapel Adventure</h1>
+    <h1>🤖 Robot Mapel Adventure</h1>
 
     <div id="setup-area">
-        <div class="admin-box">
-            <h3>⚙️ Pengaturan Game</h3>
-            <label><b>1. Nama Pemain (pisahkan dengan koma):</b></label><br>
-            <input type="text" id="pNames" placeholder="Contoh: Andi, Budi, Siti" style="width: 100%;" value="Pemain 1, Pemain 2">
-            <br><br>
-            
-            <label><b>2. Input Soal:</b></label><br>
-            <small>Format: Pertanyaan | Opsi A, Opsi B, Opsi C | Nomor Jawaban Benar (0-2)</small>
-            <textarea id="soalInput">
-Siapa penemu lampu pijar? | Thomas Edison, Newton, Einstein | 0
-Ibu kota Indonesia? | Surabaya, Jakarta, Bandung | 1
-25 x 4? | 50, 80, 100 | 2
-Apa simbol Kimia Air? | H2O, CO2, O2 | 0</textarea>
-            <br><br>
-            <button onclick="mulaiGame()">🚀 Simpan & Mulai Petualangan</button>
+        <div class="form-box">
+            <label>1. Nama Pemain (pisahkan dengan koma):</label>
+            <input type="text" id="pNames" placeholder="Contoh: Andi, Budi" value="Pemain 1, Pemain 2">
         </div>
+
+        <div class="form-box">
+            <h3>📝 Tambah Soal Pilihan Ganda</h3>
+            <div class="form-group">
+                <label>Pertanyaan:</label>
+                <input type="text" id="inQ" placeholder="Masukkan pertanyaan...">
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex:1;">
+                    <label>Pilihan A:</label>
+                    <input type="text" id="inA">
+                </div>
+                <div class="form-group" style="flex:1;">
+                    <label>Pilihan B:</label>
+                    <input type="text" id="inB">
+                </div>
+                <div class="form-group" style="flex:1;">
+                    <label>Pilihan C:</label>
+                    <input type="text" id="inC">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Jawaban yang Benar:</label>
+                <select id="inK">
+                    <option value="0">Pilihan A</option>
+                    <option value="1">Pilihan B</option>
+                    <option value="2">Pilihan C</option>
+                </select>
+            </div>
+            <button class="btn-add" onclick="tambahSoal()">➕ Tambahkan Soal ke Daftar</button>
+
+            <div class="soal-list" id="daftarSoalVisual">
+                <small style="color: #64748b;">Belum ada soal yang ditambahkan.</small>
+            </div>
+        </div>
+        <button class="btn-start" onclick="mulaiGame()">🚀 Mulai Balapan Robot!</button>
     </div>
 
     <div id="game-area" class="hidden">
-        <div class="map-area" id="map-tracks"></div>
+        <div id="map-tracks"></div>
         <div class="q-card">
-            <h2 id="turn-label">Giliran: -</h2>
-            <p id="question-text" style="font-size: 20px;">Memuat soal...</p>
+            <h2 id="turn-label"></h2>
+            <p id="question-text" style="font-size: 20px;"></p>
             <div id="options-buttons"></div>
         </div>
     </div>
 
     <div id="win-area" class="hidden">
         <h1 style="font-size: 80px;">🏆</h1>
-        <h2 id="winner-name" style="color: #059669; font-size: 32px;"></h2>
-        <button onclick="location.reload()">🔄 Main Lagi / Ganti Mapel</button>
+        <h2 id="winner-name"></h2>
+        <button style="background: #3b82f6; color:white;" onclick="location.reload()">🔄 Main Lagi</button>
     </div>
 </div>
 
 <script>
-    const AVATARS = ["🤖", "🦾", "🦿", "🛰️", "🛸", "👾"];
     let players = [];
     let gameQuestions = [];
     let currentTurn = 0;
+    const AVATARS = ["🤖", "🦾", "🦿", "🛰️", "🛸"];
+
+    function tambahSoal() {
+        const q = document.getElementById('inQ').value;
+        const a = document.getElementById('inA').value;
+        const b = document.getElementById('inB').value;
+        const c = document.getElementById('inC').value;
+        const k = document.getElementById('inK').value;
+
+        if(!q || !a || !b || !c) return alert("Mohon lengkapi pertanyaan dan semua pilihan!");
+
+        gameQuestions.push({ q, a: [a, b, c], k: parseInt(k) });
+
+        // Update tampilan daftar soal
+        const list = document.getElementById('daftarSoalVisual');
+        if(gameQuestions.length === 1) list.innerHTML = '';
+        const item = document.createElement('div');
+        item.className = 'soal-item';
+        item.innerText = ${gameQuestions.length}. ${q};
+        list.appendChild(item);
+
+        // Kosongkan form kembali
+        document.getElementById('inQ').value = '';
+        document.getElementById('inA').value = '';
+        document.getElementById('inB').value = '';
+        document.getElementById('inC').value = '';
+    }
 
     function mulaiGame() {
-        const namesInput = document.getElementById('pNames').value;
-        const soalLines = document.getElementById('soalInput').value.trim().split('\n');
-        
-        if(!namesInput.trim()) return alert("Tuliskan nama pemain dulu!");
+        const names = document.getElementById('pNames').value;
+        if(!names.trim()) return alert("Masukkan nama pemain!");
+        if(gameQuestions.length === 0) return alert("Tambahkan minimal 1 soal!");
 
-        // Reset data soal
-        gameQuestions = [];
-
-        // Validasi input soal agar tidak error
-        for (let line of soalLines) {
-            if (line.includes('|')) {
-                const parts = line.split('|');
-                if (parts.length >= 3) {
-                    gameQuestions.push({
-                        q: parts[0].trim(),
-                        a: parts[1].split(',').map(opt => opt.trim()),
-                        k: parseInt(parts[2].trim())
-                    });
-                }
-            }
-        }
-
-        if(gameQuestions.length === 0) {
-            return alert("Format soal salah! Pastikan gunakan tanda | sebagai pemisah.");
-        }
-
-        // Setup Pemain
-        players = namesInput.split(',').map((n, i) => ({
+        players = names.split(',').map((n, i) => ({
             nama: n.trim(),
             pos: 0,
             avatar: AVATARS[i % AVATARS.length]
@@ -114,14 +151,10 @@ Apa simbol Kimia Air? | H2O, CO2, O2 | 0</textarea>
         players.forEach(p => {
             const track = document.createElement('div');
             track.className = 'track';
-            // Hitung posisi robot dalam persen
             const progress = (p.pos / gameQuestions.length) * 85;
             track.innerHTML = `
-                <div class="robot" style="left: ${progress}%">
-                    ${p.avatar}
-                    <span>${p.nama}</span>
-                </div>
-                <div class="finish">🏁 FINISH</div>
+                <div class="robot" style="left: ${progress}%">${p.avatar}<span>${p.nama}</span></div>
+                <div style="position:absolute; right:20px;">🏁</div>
             `;
             container.appendChild(track);
         });
@@ -129,42 +162,32 @@ Apa simbol Kimia Air? | H2O, CO2, O2 | 0</textarea>
 
     function tampilkanSoal() {
         const p = players[currentTurn];
-        document.getElementById('turn-label').innerText = Giliran: ${p.nama} ${p.avatar};
-        
         const soal = gameQuestions[p.pos];
+        document.getElementById('turn-label').innerText = Giliran: ${p.nama} ${p.avatar};
         document.getElementById('question-text').innerText = soal.q;
         
-        const btnContainer = document.getElementById('options-buttons');
-        btnContainer.innerHTML = '';
-        
+        const btnCont = document.getElementById('options-buttons');
+        btnCont.innerHTML = '';
         soal.a.forEach((opt, i) => {
             const btn = document.createElement('button');
+            btn.className = 'btn-opt';
             btn.innerText = opt;
-            btn.onclick = () => cekJawaban(i, soal.k);
-            btnContainer.appendChild(btn);
+            btn.onclick = () => {
+                if(i === soal.k) {
+                    p.pos++;
+                    updatePeta();
+                    if(p.pos >= gameQuestions.length) {
+                        document.getElementById('game-area').classList.add('hidden');
+                        document.getElementById('win-area').classList.remove('hidden');
+                        document.getElementById('winner-name').innerText = p.nama + " MENANG!";
+                        return;
+                    }
+                } else { alert("Salah! Robot tetap di tempat."); }
+                currentTurn = (currentTurn + 1) % players.length;
+                tampilkanSoal();
+            };
+            btnCont.appendChild(btn);
         });
-    }
-
-    function cekJawaban(index, kunci) {
-        const p = players[currentTurn];
-        if(index === kunci) {
-            alert("✅ BENAR! Robot " + p.nama + " maju!");
-            p.pos++;
-            updatePeta();
-            
-            if(p.pos >= gameQuestions.length) {
-                document.getElementById('game-area').classList.add('hidden');
-                document.getElementById('win-area').classList.remove('hidden');
-                document.getElementById('winner-name').innerText = SELAMAT ${p.nama.toUpperCase()}! Kamu Juara!;
-                return;
-            }
-        } else {
-            alert("❌ SALAH! Robot mogok...");
-        }
-
-        // Ganti giliran ke pemain berikutnya
-        currentTurn = (currentTurn + 1) % players.length;
-        tampilkanSoal();
     }
 </script>
 </body>
