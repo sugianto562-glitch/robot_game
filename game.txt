@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petualangan Robot Multiplayer</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; background-color: #f0f9ff; text-align: center; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .track { background: #e2e8f0; height: 60px; margin: 10px 0; border-radius: 30px; position: relative; display: flex; align-items: center; border: 2px solid #cbd5e1; }
+        .robot { font-size: 30px; position: absolute; transition: all 0.5s ease; left: 0; }
+        .finish-line { position: absolute; right: 10px; font-weight: bold; color: #ef4444; }
+        .question-card { background: #fff; border: 2px solid #3b82f6; padding: 20px; border-radius: 10px; margin-top: 20px; }
+        button { background: #3b82f6; color: white; border: none; padding: 10px 25px; margin: 5px; border-radius: 8px; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        button:hover { background: #2563eb; transform: scale(1.05); }
+        .hidden { display: none; }
+        #winner-screen { font-size: 24px; color: #059669; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🤖 Robot Adventure Multiplayer</h1>
+    
+    <div id="setup">
+        <p>Masukkan Nama Pemain (pisahkan dengan koma):</p>
+        <input type="text" id="playerNames" placeholder="Contoh: Budi, Andi, Siti" style="padding: 10px; width: 80%;">
+        <br><br>
+        <button onclick="initGame()">Mulai Petualangan</button>
+    </div>
+
+    <div id="game-area" class="hidden">
+        <div id="tracks-container"></div>
+        
+        <div class="question-card">
+            <h3 id="turn-info">Giliran: -</h3>
+            <p id="question-text">Pertanyaan akan muncul di sini</p>
+            <div id="options-container"></div>
+        </div>
+    </div>
+
+    <div id="winner-screen" class="hidden">
+        <h2 id="winner-text"></h2>
+        <button onclick="location.reload()">Main Lagi</button>
+    </div>
+</div>
+
+<script>
+    const DAFTAR_SOAL = [
+        {q: "Berapa 10 + 15?", a: ["25", "30", "20"], k: 0},
+        {q: "Warna langit saat siang?", a: ["Hijau", "Biru", "Ungu"], k: 1},
+        {q: "Berapa 5 x 5?", a: ["20", "15", "25"], k: 2},
+        {q: "Robot digerakkan oleh?", a: ["Listrik", "Nasi", "Kayu"], k: 0},
+        {q: "100 dibagi 2?", a: ["40", "50", "60"], k: 1}
+    ];
+
+    let pemain = [];
+    let giliranSekarang = 0;
+    const totalLangkah = DAFTAR_SOAL.length;
+
+    function initGame() {
+        const namesInput = document.getElementById('playerNames').value;
+        if(!namesInput) return alert("Masukkan nama pemain!");
+        
+        pemain = namesInput.split(',').map(n => ({ nama: n.trim(), posisi: 0 }));
+        document.getElementById('setup').classList.add('hidden');
+        document.getElementById('game-area').classList.remove('hidden');
+        
+        renderTracks();
+        tampilkanSoal();
+    }
+
+    function renderTracks() {
+        const container = document.getElementById('tracks-container');
+        container.innerHTML = '';
+        pemain.forEach((p, index) => {
+            const track = document.createElement('div');
+            track.className = 'track';
+            const posPercent = (p.posisi / totalLangkah) * 90;
+            track.innerHTML = `
+                <div class="robot" style="left: ${posPercent}%">🤖 <small style="font-size:10px">${p.nama}</small></div>
+                <div class="finish-line">FINISH</div>
+            `;
+            container.appendChild(track);
+        });
+    }
+
+    function tampilkanSoal() {
+        const p = pemain[giliranSekarang];
+        document.getElementById('turn-info').innerText = Giliran: ${p.nama};
+        
+        // Ambil soal berdasarkan posisi pemain
+        const soal = DAFTAR_SOAL[p.posisi];
+        document.getElementById('question-text').innerText = soal.q;
+        
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '';
+        soal.a.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.innerText = opt;
+            btn.onclick = () => jawab(i, soal.k);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function jawab(index, kunci) {
+        if(index === kunci) {
+            alert("✅ BENAR!");
+            pemain[giliranSekarang].posisi++;
+        } else {
+            alert("❌ SALAH!");
+        }
+
+        if(pemain[giliranSekarang].posisi >= totalLangkah) {
+            document.getElementById('game-area').classList.add('hidden');
+            document.getElementById('winner-screen').classList.remove('hidden');
+            document.getElementById('winner-text').innerText = 🎉 SELAMAT ${pemain[giliranSekarang].nama} MENANG! 🎉;
+        } else {
+            giliranSekarang = (giliranSekarang + 1) % pemain.length;
+            renderTracks();
+            tampilkanSoal();
+        }
+    }
+</script>
+</body>
+</html>
