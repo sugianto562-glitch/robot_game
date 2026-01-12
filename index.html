@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petualangan Robot Multiplayer</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; background-color: #f0f9ff; text-align: center; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .track { background: #e2e8f0; height: 60px; margin: 10px 0; border-radius: 30px; position: relative; display: flex; align-items: center; border: 2px solid #cbd5e1; }
+        .robot { font-size: 30px; position: absolute; transition: all 0.5s ease; left: 0; }
+        .finish-line { position: abs…
+[20.03, 12/1/2026] Sugianto: <!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Robot Adventure Map</title>
+    <style>
+        body { font-family: sans-serif; background: #e0f2fe; text-align: center; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .map { background: #f8fafc; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 2px dashed #cbd5e1; }
+        .track { background: white; height: 60px; margin: 10px 0; border-radius: 30px; position: relative; display: flex; align-items: center; border: 1px solid #e2e8f0; }
+        .robot { font-size: 30px; position: absolute; transition: all 0.5s ease; left: 10px; z-index: 2; }
+        .robot span { font-size: 10px; display: block; margin-top: -5px; font-weight: bold; color: #334155; }
+        .finish { position: absolute; right: 10px; font-weight: bold; color: #ef4444; }
+        .question-card { background: #3b82f6; color: white; padding: 20px; border-radius: 15px; }
+        button { background: white; color: #3b82f6; border: none; padding: 10px 20px; margin: 5px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🚀 Misi Peta Robot</h1>
+    <div id="setup">
+        <input type="text" id="pNames" placeholder="Nama pemain (pisah koma)" style="padding:10px; width:70%;">
+        <button onclick="start()">Mulai</button>
+    </div>
+    <div id="game" class="hidden">
+        <div class="map" id="map-area"></div>
+        <div class="question-card">
+            <h3 id="t-info"></h3>
+            <p id="q-text"></p>
+            <div id="opts"></div>
+        </div>
+    </div>
+    <div id="win" class="hidden">
+        <h2 id="w-text"></h2>
+        <button onclick="location.reload()">Main Lagi</button>
+    </div>
+</div>
+<script>
+    const AVATARS = ["🤖", "🦾", "🦿", "🛰️"];
+    const SOAL = [
+        {q: "12 + 18?", a: ["25", "30", "35"], k: 1},
+        {q: "Warna langit cerah?", a: ["Biru", "Merah", "Hijau"], k: 0},
+        {q: "Bumi itu bulat?", a: ["Ya", "Tidak", "Kotak"], k: 0},
+        {q: "5 x 6?", a: ["25", "30", "40"], k: 1}
+    ];
+    let players = [], turn = 0;
+    function start() {
+        let input = document.getElementById('pNames').value;
+        if(!input) return;
+        players = input.split(',').map((n, i) => ({ n: n.trim(), p: 0, v: AVATARS[i % 4] }));
+        document.getElementById('setup').classList.add('hidden');
+        document.getElementById('game').classList.remove('hidden');
+        draw(); ask();
+    }
+    function draw() {
+        const area = document.getElementById('map-area');
+        area.innerHTML = '';
+        players.forEach(p => {
+            const track = document.createElement('div');
+            track.className = 'track';
+            track.innerHTML = <div class="robot" style="left:${(p.p/SOAL.length)*85}%">${p.v}<span>${p.n}</span></div><div class="finish">🏁</div>;
+            area.appendChild(track);
+        });
+    }
+    function ask() {
+        const p = players[turn];
+        document.getElementById('t-info').innerText = Giliran: ${p.n} ${p.v};
+        const s = SOAL[p.p];
+        document.getElementById('q-text').innerText = s.q;
+        const optCont = document.getElementById('opts');
+        optCont.innerHTML = '';
+        s.a.forEach((o, i) => {
+            const btn = document.createElement('button');
+            btn.innerText = o;
+            btn.onclick = () => {
+                if(i === s.k) { p.p++; draw(); if(p.p >= SOAL.length) { 
+                    document.getElementById('game').classList.add('hidden');
+                    document.getElementById('win').classList.remove('hidden');
+                    document.getElementById('w-text').innerText = p.n + " MENANG!";
+                    return;
+                } }
+                turn = (turn + 1) % players.length; ask();
+            };
+            optCont.appendChild(btn);
+        });
+    }
+</script>
+</body>
+</html>
